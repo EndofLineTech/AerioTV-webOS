@@ -8,6 +8,12 @@ Android TV capabilities where appropriate, and targets webOS 22 and newer.
 Implementation has not begun. See the [approved implementation plan](docs/implementation-plan.md)
 and [12-epic backlog index](docs/backlog-index.md).
 
+## Branches
+
+Development happens on [`dev`](https://github.com/EndofLineTech/AerioTV-webOS/tree/dev).
+`main` is reserved for release-ready changes. Base feature branches and pull
+requests for development on `dev`.
+
 ## Backlog on a fresh clone
 
 The installed Beads CLI stores its Dolt database locally, outside Git. To

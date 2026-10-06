@@ -1,5 +1,11 @@
 # Agent Instructions
 
+## Branch Policy
+
+All development work goes on `dev`. Create feature branches from `dev` when
+appropriate and merge them back into `dev`. Keep `main` for release-ready work;
+do not commit development changes directly to `main`.
+
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
 
 ## Quick Reference
