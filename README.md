@@ -7,6 +7,11 @@ Android TV capabilities where appropriate, and targets webOS 22 and newer.
 
 Implementation has not begun. See the [approved implementation plan](docs/implementation-plan.md)
 and [12-epic backlog index](docs/backlog-index.md).
+The pinned-source specification covers the [TV screen/settings inventory](docs/reference-inventory.md),
+[visual reference coverage](docs/visual-baseline.md),
+[remote control and navigation](docs/remote-control-contract.md),
+[platform decisions](docs/platform-decisions.md) and
+[reuse/attribution requirements](docs/reuse-attribution.md).
 
 ## Branches
 

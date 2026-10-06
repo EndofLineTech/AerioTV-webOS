@@ -70,7 +70,14 @@ resolved by the product owner. Use Beads for subsequent changes, not this manife
 as a second status board.
 
 Source inventories, visual baselines, remote contracts, capability matrices and ADRs
-are deliverables of E01/E02; this document does not claim those audits are complete.
+are deliverables of E01/E02. The E01 source-reference package is
+[screen/settings inventory](reference-inventory.md),
+[visual baseline](visual-baseline.md),
+[remote/navigation contract](remote-control-contract.md),
+[cross-platform decisions](platform-decisions.md), and
+[reuse/attribution requirements](reuse-attribution.md). E02 still owns physical-TV
+capability tests. Repository screenshots cover onboarding only; see the visual
+baseline before claiming pixel parity for the guide, player or settings.
 
 ## References
 

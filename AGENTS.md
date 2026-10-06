@@ -15,7 +15,7 @@ bd ready              # Find available work
 bd show <id>          # View issue details
 bd update <id> --status in_progress  # Claim work
 bd close <id>         # Complete work
-bd sync               # Sync with git
+bd vc commit -m "Describe issue updates"  # Commit pending local Dolt changes
 ```
 
 <!-- BEGIN BEADS INTEGRATION -->
@@ -26,7 +26,7 @@ bd sync               # Sync with git
 ### Why bd?
 
 - Dependency-aware: Track blockers and relationships between issues
-- Git-friendly: Auto-syncs to JSONL for version control
+- Dependency-aware Dolt storage; see README for fresh-clone bootstrap
 - Agent-optimized: JSON output, ready work detection, discovered-from links
 - Prevents duplicate tracking systems and confusion
 
@@ -83,13 +83,14 @@ bd close bd-42 --reason "Completed" --json
    - `bd create "Found bug" --description="Details about what was found" -p 1 --deps discovered-from:<parent-id>`
 5. **Complete**: `bd close <id> --reason "Done"`
 
-### Auto-Sync
+### Beads persistence
 
-bd automatically syncs with git:
-
-- Exports to `.beads/issues.jsonl` after changes (5s debounce)
-- Imports from JSONL when newer (e.g., after `git pull`)
-- No manual export/import needed!
+This installed `bd` version keeps issues in a local Dolt database ignored by
+Git. `bd sync` is deprecated and is a no-op. A fresh clone can bootstrap the
+original issue IDs with `python3 scripts/create_backlog.py`; doing so does not
+restore subsequent statuses. Configure a shared Dolt remote before using
+multiple working clones for issue updates. Commit pending issue changes with
+`bd vc commit -m "Describe issue updates"`.
 
 ### Important Rules
 
@@ -101,7 +102,7 @@ bd automatically syncs with git:
 - ❌ Do NOT use external issue trackers
 - ❌ Do NOT duplicate tracking systems
 
-For more details, see README.md and docs/QUICKSTART.md.
+For more details, see README.md and docs/backlog-index.md.
 
 <!-- END BEADS INTEGRATION -->
 
@@ -115,11 +116,11 @@ For more details, see README.md and docs/QUICKSTART.md.
 2. **Run quality gates** (if code changed) - Tests, linters, builds
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   bd sync
-   git push
-   git status  # MUST show "up to date with origin"
+    ```bash
+    git pull --rebase
+    bd vc commit -m "Describe issue updates"  # Only if Dolt has pending changes
+    git push
+    git status  # MUST show "up to date with origin"
    ```
 5. **Clean up** - Clear stashes, prune remote branches
 6. **Verify** - All changes committed AND pushed
