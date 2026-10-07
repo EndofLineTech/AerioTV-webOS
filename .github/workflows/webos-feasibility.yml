@@ -1,0 +1,44 @@
+name: Build webOS feasibility probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev]
+    paths:
+      - .github/workflows/webos-feasibility.yml
+      - spikes/webos-feasibility/**
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: spikes/webos-feasibility/package-lock.json
+      - name: Install media fixture tools
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg unzip
+      - name: Build and verify probe
+        working-directory: spikes/webos-feasibility
+        run: |
+          npm ci
+          npm test
+          npm run fixtures
+          npm run package
+          npm exec -- ares-package --info out/com.endoflinetech.aeriotvfeasibility_0.0.1_all.ipk
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: aeriotv-webos-feasibility
+          path: |
+            spikes/webos-feasibility/build/app/
+            spikes/webos-feasibility/build/media/
+            spikes/webos-feasibility/fixtures/server.mjs
+            spikes/webos-feasibility/service/
+            spikes/webos-feasibility/out/*.ipk
+          if-no-files-found: error
+          retention-days: 7

@@ -75,6 +75,12 @@ test('protected media requires the token on BOTH manifest and segments', async (
   assert.match(await authorized.text(), /EXTM3U/);
   const segment = await fetch(`${fixture.baseUrl}/protected/sample0.ts`);
   assert.equal(segment.status, 401);
+
+  const corsless = await fetch(`${fixture.baseUrl}/protected-no-cors/index.m3u8`, {
+    headers: { 'X-Probe-Token': 'probe-token' },
+  });
+  assert.equal(corsless.status, 200);
+  assert.equal(corsless.headers.get('access-control-allow-origin'), null);
 });
 
 test('MSE input and HLS manifests use distinct media MIME types', async () => {

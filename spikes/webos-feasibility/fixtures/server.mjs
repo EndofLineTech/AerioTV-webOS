@@ -23,7 +23,7 @@ function send(response, status, body, method, type = 'application/json') {
 }
 
 function assetName(pathname) {
-  const stripped = pathname.replace(/^\/protected\//, '/').slice(1);
+  const stripped = pathname.replace(/^\/(protected|protected-no-cors)\//, '/').slice(1);
   if (Object.hasOwn(mediaTypes, stripped) || /^sample[0-9]+\.ts$/.test(stripped)) return stripped;
   return null;
 }
@@ -39,7 +39,7 @@ export async function createFixtureServer({ host = '0.0.0.0', port = 8088, media
       return;
     }
 
-    if (pathname !== '/no-cors') cors(response);
+    if (pathname !== '/no-cors' && !pathname.startsWith('/protected-no-cors/')) cors(response);
     if (request.method === 'OPTIONS') {
       response.writeHead(204);
       response.end();
@@ -54,7 +54,8 @@ export async function createFixtureServer({ host = '0.0.0.0', port = 8088, media
       response.end();
       return;
     }
-    if (pathname === '/auth' || pathname.startsWith('/protected/')) {
+    if (pathname === '/auth' || pathname.startsWith('/protected/') ||
+        pathname.startsWith('/protected-no-cors/')) {
       if (request.headers['x-probe-token'] !== 'probe-token') {
         send(response, 401, '{"authorized":false}', request.method);
         return;

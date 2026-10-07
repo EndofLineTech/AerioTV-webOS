@@ -5,7 +5,8 @@ The local fixture server runs only during development; the released TV app is
 still TV-only and has no additional server dependency. This probe accepts
 **synthetic data only**. Do not enter IPTV credentials, provider addresses or
 real stream URLs. The app accepts a private IPv4 LAN address and the bundled
-service only requests four named fixture routes.
+service only requests a fixed set of synthetic fixture routes, including its
+short-lived authenticated HLS test.
 
 ## Build and run the fixture server on the development PC
 
@@ -54,7 +55,20 @@ credentials belong in your local CLI configuration, not Git.
 
 The owner has the macOS webOS TV Simulator 26 v1.5.0. LG stopped shipping a
 VirtualBox **Emulator** after webOS 6; the version 26 tool is the **Simulator**.
-It launches app files directly rather than installing an IPK. On the Mac where
+It launches app files directly rather than installing an IPK.
+
+**Prebuilt option:** After the dev-branch
+[Build webOS feasibility probe](https://github.com/EndofLineTech/AerioTV-webOS/actions/workflows/webos-feasibility.yml)
+workflow succeeds, download its `aeriotv-webos-feasibility` artifact and unzip
+it. The archive contains `build/app` (select for **File → Launch App**),
+`service` (select for **File → Add Service**), `build/media`,
+`fixtures/server.mjs`, and the separate retail-TV `.ipk`. With Node 20+ on
+your Mac, run `node fixtures/server.mjs` from the extracted root, then open
+Simulator and choose the two folders via those menus. No npm or FFmpeg step is
+needed when using this artifact. It expires after seven days; rebuild with the
+source commands below if it has expired.
+
+**Source option:** On the Mac where
 Simulator is installed, generate fixtures and stage the app first:
 
 ```sh
@@ -118,7 +132,7 @@ with query strings or response bodies. Inspect before sharing anyway.
 | --- | --- |
 | Device; CORS test; service request | Model/version, browser CORS/no-CORS, preflight token success/401, redirect, Range/206, image CORS, service status and custom User-Agent feasibility. System info uses `systemconfig.query` ACG when enforced. |
 | One MP4, one HLS, one MSE | `loadedmetadata`, `playing`, errors, image/audio, MSE append, buffered ranges. Repeat with the actual target provider only **after** determining safe auth and permission, without sharing credentials/logs. DASH and continuous-TS are **not** covered by these fixtures. |
-| Protected HLS; service request | Browser native video normally cannot attach an auth header to every manifest/segment; compare the failure to the service request with its synthetic header. This is a transport experiment, not a finished proxy. |
+| Protected HLS; service request; on-TV media proxy | Browser native video normally cannot attach an auth header to every manifest/segment, and the second protected fixture has no CORS. Compare direct failure, the service's synthetic header request, and **Try protected HLS via on-TV JS service**. Observe actual picture/audio for at least 10 seconds; then **Stop on-TV media probe**. The service binds a short-lived loopback-only URL, not an external product server. Simulator success is not retail-TV proof. |
 | Seek/Rate/Metrics | Seek result and seekable range, actual playback-rate behavior (LG docs list non-1× as unsupported), video resolution, audio/subtitle/decoded-frame API availability. |
 | App storage and service marker | Run Storage/Service Storage, leave/relaunch/reboot and repeat; note survival, quota, errors and service/web-app data separation. Do not infer local DVR or indefinite background recording from small-marker success. |
 | Home/Back/suspend | Press Back at probe root (LG exit behavior), open another TV app, relaunch, repeat playback and storage. Note foreground/hidden events, video cleanup and any screensaver interference. |

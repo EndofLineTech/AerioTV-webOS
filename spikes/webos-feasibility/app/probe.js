@@ -6,6 +6,7 @@
   const logNode = document.getElementById('log');
   const tiles = document.getElementById('tiles');
   const input = document.getElementById('base');
+  let mediaSubscription = null;
 
   function log(label, result) {
     const value = result === undefined ? '' : ' ' + JSON.stringify(result);
@@ -49,6 +50,7 @@
     for (const [path, options] of [
       ['/cors', {}], ['/no-cors', {}], ['/redirect', {}],
       ['/auth', {}], ['/auth', { headers: { 'X-Probe-Token': 'probe-token' } }],
+      ['/protected-no-cors/index.m3u8', { headers: { 'X-Probe-Token': 'probe-token' } }],
       ['/vod.mp4', { headers: { Range: 'bytes=0-99' } }],
     ]) {
       try { await request(path, options); }
@@ -138,6 +140,18 @@
   }
 
   function stopVideo() {
+    if (mediaSubscription) {
+      if (typeof webOS !== 'undefined' && webOS.service?.request) {
+        webOS.service.request('luna://com.endoflinetech.aeriotvfeasibility.network', {
+          method: 'stopMediaProbe',
+          onFailure: function (error) {
+            log('on-TV media stop failed', { code: error.errorCode, text: error.errorText });
+          },
+        });
+      }
+      mediaSubscription.cancel();
+      mediaSubscription = null;
+    }
     for (const video of tiles.querySelectorAll('video')) {
       video.pause();
       video.removeAttribute('src');
@@ -236,6 +250,63 @@
     log('attempted ' + count + ' concurrent media elements', { type: path, audioOwner: 0 });
   }
 
+  function playViaOnTVService() {
+    if (typeof webOS === 'undefined' || !webOS.service?.request) {
+      log('on-TV media probe unavailable: webOSTV.js service API missing');
+      return;
+    }
+    const url = baseUrl() + '/auth';
+    stopVideo();
+    mediaSubscription = webOS.service.request('luna://com.endoflinetech.aeriotvfeasibility.network', {
+      method: 'startMediaProbe',
+      subscribe: true,
+      resubscribe: false,
+      parameters: { url: url },
+      onSuccess: function (response) {
+        if (!response.returnValue || response.active === false) {
+          log('on-TV media probe stopped', { reason: response.reason || response.errorText || 'unknown' });
+          stopVideo();
+          return;
+        }
+        if (typeof response.url !== 'string') {
+          log('on-TV media probe returned no local URL');
+          stopVideo();
+          return;
+        }
+        let local;
+        try { local = new URL(response.url); }
+        catch {
+          log('on-TV media probe returned an invalid endpoint');
+          stopVideo();
+          return;
+        }
+        if (local.protocol !== 'http:' || local.hostname !== '127.0.0.1' ||
+            local.pathname !== '/hls/index.m3u8' || !local.port) {
+          log('on-TV media probe returned an unexpected endpoint');
+          stopVideo();
+          return;
+        }
+        log('on-TV media probe started', { port: response.port, leaseMs: response.leaseMs });
+        const player = document.createElement('video');
+        player.controls = true;
+        tiles.appendChild(player);
+        for (const eventName of ['loadedmetadata', 'playing', 'waiting', 'stalled', 'error', 'ended']) {
+          player.addEventListener(eventName, function () {
+            if (tiles.contains(player)) videoState(player, 0, eventName);
+          });
+        }
+        player.src = response.url;
+        player.play().catch(function (error) {
+          log('on-TV media playback failed', { name: error.name, message: error.message });
+        });
+      },
+      onFailure: function (error) {
+        log('on-TV media probe failed', { code: error.errorCode, text: error.errorText });
+        stopVideo();
+      },
+    });
+  }
+
   const actions = {
     device: device,
     storage: localStorageCheck,
@@ -249,6 +320,8 @@
     hls: function () { playMany(1, '/index.m3u8'); },
     mse: function () { playMSE().catch(function (error) { log('MSE setup failed', { message: error.message }); }); },
     protected: function () { playMany(1, '/protected/index.m3u8'); },
+    proxy: playViaOnTVService,
+    'proxy-stop': stopVideo,
     two: function () { playMany(2, '/index.m3u8'); },
     four: function () { playMany(4, '/index.m3u8'); },
     nine: function () { playMany(9, '/index.m3u8'); },
