@@ -91,3 +91,30 @@ test('MSE input and HLS manifests use distinct media MIME types', async () => {
   assert.equal(hls.status, 200);
   assert.equal(hls.headers.get('content-type'), 'application/vnd.apple.mpegurl');
 });
+
+test('Simulator can send a bounded report that is readable locally without clipboard access', async () => {
+  const preflight = await fetch(`${fixture.baseUrl}/report`, {
+    method: 'OPTIONS',
+    headers: { Origin: 'null', 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type' },
+  });
+  assert.equal(preflight.status, 204);
+  assert.match(preflight.headers.get('access-control-allow-methods'), /POST/);
+  assert.match(preflight.headers.get('access-control-allow-headers'), /Content-Type/i);
+
+  const saved = await fetch(`${fixture.baseUrl}/report`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: 'null' },
+    body: JSON.stringify({ lines: ['Simulator 26 probe', '/cors {"status":200}'] }),
+  });
+  assert.equal(saved.status, 201);
+  const report = await fetch(`${fixture.baseUrl}/report`);
+  assert.equal(report.status, 200);
+  assert.deepEqual((await report.json()).lines, ['Simulator 26 probe', '/cors {"status":200}']);
+
+  const invalid = await fetch(`${fixture.baseUrl}/report`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ lines: [4] }),
+  });
+  assert.equal(invalid.status, 400);
+});

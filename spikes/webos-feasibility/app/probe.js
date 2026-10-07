@@ -17,6 +17,18 @@
     logNode.scrollTop = logNode.scrollHeight;
   }
 
+  async function sendResults() {
+    const lines = entries.filter((line) => line.length <= 1000).slice(-200);
+    while (JSON.stringify({ lines }).length > 60000) lines.shift();
+    const response = await fetch(baseUrl() + '/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lines }),
+    });
+    if (!response.ok) throw new Error('fixture server rejected results: HTTP ' + response.status);
+    log('results sent to this Mac', { lines: lines.length });
+  }
+
   function baseUrl() {
     const value = new URL(input.value);
     const numbers = value.hostname.split('.').map(Number);
@@ -339,6 +351,7 @@
       output.value = entries.join('\n');
       output.focus();
       output.select();
+      sendResults().catch(function (error) { log('sending results failed', { message: error.message }); });
     },
   };
   for (const [id, action] of Object.entries(actions)) {

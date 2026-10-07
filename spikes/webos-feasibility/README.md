@@ -122,9 +122,13 @@ On the TV, enter `http://<PC_LAN_IP>:8088` and select each on-screen probe.
 Select **Device** first; save the model, SDK version, firmware, and board from
 the log in your private test notes. Use `ares-inspect --device aerio-tv --app
 com.endoflinetech.aeriotvfeasibility --open` for browser errors if a probe
-doesn't return. **Show copyable results** makes a text field containing the
-last 250 log lines. The log contains no passwords, token values, media URLs
-with query strings or response bodies. Inspect before sharing anyway.
+doesn't return. **Send results to this Mac** posts a bounded snapshot of probe
+events to the running fixture server; Simulator clipboard access is not needed.
+On this Mac only, read the last submitted report with
+`curl http://127.0.0.1:8088/report`. The report lives in server memory and is
+not saved to disk; only loopback clients can retrieve it. The probe log
+contains no passwords, token values, media URLs with query strings or response
+bodies. Inspect before sharing it further anyway.
 
 ### Run order and evidence to record
 

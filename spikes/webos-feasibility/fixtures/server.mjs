@@ -10,10 +10,11 @@ const mediaTypes = {
   'icon.png': 'image/png',
 };
 
-function cors(response) {
+function cors(response, allowReport = false) {
   response.setHeader('Access-Control-Allow-Origin', '*');
-  response.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
-  response.setHeader('Access-Control-Allow-Headers', 'X-Probe-Token, X-Probe-User-Agent, Range');
+  response.setHeader('Access-Control-Allow-Methods', allowReport ? 'GET, HEAD, OPTIONS, POST' : 'GET, HEAD, OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers',
+    allowReport ? 'Content-Type' : 'X-Probe-Token, X-Probe-User-Agent, Range');
   response.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges');
 }
 
@@ -30,6 +31,7 @@ function assetName(pathname) {
 
 export async function createFixtureServer({ host = '0.0.0.0', port = 8088, mediaDir } = {}) {
   if (!mediaDir) throw new Error('mediaDir is required; run npm run fixtures first');
+  let latestReport = null;
   const server = http.createServer(async (request, response) => {
     let pathname;
     try {
@@ -39,10 +41,53 @@ export async function createFixtureServer({ host = '0.0.0.0', port = 8088, media
       return;
     }
 
-    if (pathname !== '/no-cors' && !pathname.startsWith('/protected-no-cors/')) cors(response);
+    if (pathname !== '/no-cors' && !pathname.startsWith('/protected-no-cors/')) {
+      cors(response, pathname === '/report');
+    }
     if (request.method === 'OPTIONS') {
       response.writeHead(204);
       response.end();
+      return;
+    }
+    if (pathname === '/report') {
+      if (request.method === 'GET') {
+        if (!['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(request.socket.remoteAddress)) {
+          send(response, 403, '{}', request.method);
+          return;
+        }
+        send(response, latestReport ? 200 : 404, JSON.stringify(latestReport || {}), request.method);
+        return;
+      }
+      if (request.method !== 'POST') {
+        send(response, 405, '{}', request.method);
+        return;
+      }
+      if (String(request.headers['content-type'] || '').split(';')[0] !== 'application/json') {
+        send(response, 415, '{}', request.method);
+        return;
+      }
+      const chunks = [];
+      let bytes = 0;
+      let tooLarge = false;
+      request.on('data', (part) => {
+        bytes += part.length;
+        if (bytes > 65536) tooLarge = true;
+        else chunks.push(part);
+      });
+      request.on('end', () => {
+        if (tooLarge) { send(response, 413, '{}', request.method); return; }
+        let payload;
+        try { payload = JSON.parse(Buffer.concat(chunks).toString('utf8')); }
+        catch { send(response, 400, '{}', request.method); return; }
+        const lines = payload?.lines;
+        if (!Array.isArray(lines) || lines.length < 1 || lines.length > 250 ||
+            !lines.every((line) => typeof line === 'string' && line.length <= 1000)) {
+          send(response, 400, '{}', request.method);
+          return;
+        }
+        latestReport = { at: new Date().toISOString(), lines };
+        send(response, 201, JSON.stringify({ saved: true, lines: lines.length }), request.method);
+      });
       return;
     }
     if (request.method !== 'GET' && request.method !== 'HEAD') {
