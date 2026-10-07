@@ -39,6 +39,11 @@ webOS 22 browser compatibility or retail multiview support.
 - Graphics use webOS's **1920×1080 web-app viewport** even on UHD TVs ([appinfo](https://webostv.developer.lge.com/develop/references/appinfo-json#resolution)); decoded 4K video capability is a separate model-specific question.
 - HLS is a documented single-stream path, but provider format/codec and conditional CORS/auth must be tested per source. No format declaration or MSE feature flag is a substitute for picture+sound on hardware.
 
+Research on sync, existing Android companion-control protocol, token storage,
+home/PiP and LG Store integration is recorded as **unapproved options** in
+[the E02 capability note](webos-capability-options.md). Those paths need
+physical-TV evidence and the owner's decision before becoming an ADR.
+
 ### Device evidence required before closing this epic
 
 Record the model, firmware, SDK/webOS version, region/network setup, fixture
