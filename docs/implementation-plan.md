@@ -57,7 +57,8 @@ access blocks executing device spikes, but does not block creating the backlog.
 
 ## Backlog maintenance
 
-`scripts/create_backlog.py` contains the approved 12-epic/60-child creation manifest.
+`scripts/create_backlog.py` contains the approved 12-epic/60-child creation manifest
+plus the discovered E12.6 tooling follow-up.
 Its `plan-E01` / `plan-E01.1` labels map proposal aliases to real Beads IDs. It reuses
 existing aliases on rerun and never resets issue status. Fresh clones must first
 initialize Beads and run the manifest to recreate the initial backlog because the
@@ -81,6 +82,12 @@ are deliverables of E01/E02. The E01 source-reference package is
 [reuse/attribution requirements](reuse-attribution.md). E02 still owns physical-TV
 capability tests. Repository screenshots cover onboarding only; see the visual
 baseline before claiming pixel parity for the guide, player or settings.
+
+The [E02 evidence ledger](webos-feasibility.md) distinguishes LG documentation,
+packaged developer-probe tests, Simulator observations and retail TV results.
+LG's [multi-video FAQ](https://webostv.developer.lge.com/faq/can-i-use-two-video-tags-at-the-same-time)
+states that two simultaneous HTML video elements are not officially supported;
+the nine-stream goal requires an explicit hardware/architecture decision.
 
 ## References
 

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AerioTV Feasibility Probe</title>
+  <link rel="stylesheet" href="probe.css">
+  <script src="lib/webOSTV.js"></script>
+  <script src="probe.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>AerioTV · webOS feasibility</h1>
+    <p>Developer diagnostic only. Connect to the included synthetic fixture server; never enter IPTV credentials or real stream URLs.</p>
+    <section>
+      <h2>Device and storage</h2>
+      <button id="device">Read TV model/version and media APIs</button>
+      <button id="storage">Write/read local storage</button>
+      <button id="service-storage">Write/read service marker</button>
+    </section>
+    <section>
+      <h2>Local fixture server</h2>
+      <label for="base">Computer's LAN address (for example http://192.168.1.10:8088)</label>
+      <input id="base" type="url" value="http://192.168.1.10:8088" autocomplete="off">
+      <button id="requests">Test CORS, redirect, auth, Range and artwork</button>
+      <button id="service-request">Test bundled on-TV JS service request</button>
+      <p>Plain HTTP on a private test LAN; no provider account required. No endpoint is exposed to the internet.</p>
+    </section>
+    <section>
+      <h2>Video plane</h2>
+      <button id="mp4">Play one H.264/AAC MP4</button>
+      <button id="hls">Play one HLS-TS stream</button>
+      <button id="mse">Play fragmented MP4 via MediaSource</button>
+      <button id="protected">Try header-protected HLS (expected to fail)</button>
+      <button id="two">Try two streams</button>
+      <button id="four">Try four streams</button>
+      <button id="nine">Try nine streams</button>
+      <button id="stop">Stop and release all video</button>
+      <button id="seek">Seek first video to 3 seconds</button>
+      <button id="rate">Set first video to 1.25×</button>
+      <button id="metrics">Inspect first video tracks and decoded frames</button>
+      <div id="tiles" aria-label="Media test tiles"></div>
+    </section>
+    <section>
+      <h2>Observations</h2>
+      <button id="results">Show copyable results</button>
+      <pre id="log" aria-live="polite"></pre>
+      <textarea id="export" aria-label="Copyable results" readonly></textarea>
+    </section>
+  </main>
+</body>
+</html>

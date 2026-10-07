@@ -1,0 +1,5 @@
+{
+  "name": "com.endoflinetech.aeriotvfeasibility.network",
+  "main": "service.cjs",
+  "version": "0.0.1"
+}

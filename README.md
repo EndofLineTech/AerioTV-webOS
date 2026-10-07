@@ -13,6 +13,11 @@ The pinned-source specification covers the [TV screen/settings inventory](docs/r
 [platform decisions](docs/platform-decisions.md) and
 [reuse/attribution requirements](docs/reuse-attribution.md).
 
+E02 platform research, including LG's documented single-media-element limit,
+is in [the capability evidence ledger](docs/webos-feasibility.md). The separate
+[macOS Simulator/retail-TV diagnostic probe](spikes/webos-feasibility/README.md)
+uses synthetic fixtures; retail hardware results remain pending.
+
 ## Branches
 
 Development happens on [`dev`](https://github.com/EndofLineTech/AerioTV-webOS/tree/dev).
@@ -22,7 +27,8 @@ requests for development on `dev`.
 ## Backlog on a fresh clone
 
 The installed Beads CLI stores its Dolt database locally, outside Git. To
-recreate the **initial** 72 issues under the same IDs:
+recreate the **initial** 72 issues and the first discovered tooling issue under
+the same IDs:
 
 ```sh
 bd init --prefix aerio

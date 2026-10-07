@@ -1,8 +1,9 @@
 # Approved backlog index
 
 Beads is the source of truth for status, dependencies and acceptance criteria.
-Each epic has five children, numbered `.1` through `.5`, corresponding to the
-approved plan aliases. For example, E01.1 is `aerio-bk6.1`.
+Each epic has five originally approved children, numbered `.1` through `.5`.
+E12 also has discovered follow-up E12.6 (`aerio-6cv.6`). For example, E01.1
+is `aerio-bk6.1`.
 
 | Plan alias | Beads epic | Scope |
 | --- | --- | --- |
@@ -40,9 +41,11 @@ the applicable inventory screens and the tvOS-first source corrections. Run
 `python3 scripts/create_backlog.py --references-only` to restore missing links
 on an existing board; it preserves status, other notes, and chosen spec IDs.
 
-All 72 issues were created open. There are 60 parent-child relationships and 164
-task-level blocking dependencies. The initial Dolt database is local and excluded
-from Git by Beads. After cloning, run `bd init --prefix aerio` and
-`python3 scripts/create_backlog.py` to reconstruct these initial issues under the
-same IDs. This is an initial-board bootstrap, not a way to sync later statuses;
+The original 72 issues were created open; E12.6 is the first discovered item.
+The baseline had 60 parent-child relationships and 164 task-level blocking
+dependencies; E12.6 adds a child and a blocker for E12.4. The Dolt database
+is local and excluded from Git by Beads. After cloning, run
+`bd init --prefix aerio` and `python3 scripts/create_backlog.py` to reconstruct
+these initial issues under the same IDs. This is an initial-board bootstrap,
+not a way to sync later statuses;
 configure a shared Dolt remote before using multiple working clones.

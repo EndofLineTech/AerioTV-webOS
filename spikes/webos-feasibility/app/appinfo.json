@@ -1,0 +1,12 @@
+{
+  "id": "com.endoflinetech.aeriotvfeasibility",
+  "title": "AerioTV Feasibility Probe",
+  "vendor": "EndofLineTech",
+  "version": "0.0.1",
+  "type": "web",
+  "main": "index.html",
+  "icon": "icon.png",
+  "resolution": "1920x1080",
+  "requiredACG": ["systemconfig.query"],
+  "disableBackHistoryAPI": true
+}

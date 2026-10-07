@@ -1,0 +1,10 @@
+{
+  "id": "com.endoflinetech.aeriotvfeasibility.network",
+  "description": "AerioTV local developer feasibility probe",
+  "services": [
+    {
+      "name": "com.endoflinetech.aeriotvfeasibility.network",
+      "description": "LAN fixture and small-file service capability checks"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "aeriotv-webos-feasibility",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "fixtures": "node fixtures/generate-media.mjs",
+    "serve": "node fixtures/server.mjs",
+    "package": "node scripts/prepare-package.mjs && ares-package --no-minify --outdir out build/app service"
+  },
+  "devDependencies": {
+    "@webos-tools/cli": "3.2.6"
+  }
+}

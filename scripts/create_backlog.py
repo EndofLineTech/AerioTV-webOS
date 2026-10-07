@@ -99,6 +99,11 @@ SCREEN_FOCUS = {
 
 def reference_for(alias):
     """Return primary spec and Beads note for an E02-E12 epic or child."""
+    if alias == "E12.6":
+        return ("docs/webos-feasibility.md",
+                f"{REFERENCE_MARKER}: Review docs/webos-feasibility.md and "
+                "spikes/webos-feasibility/README.md for the host-side CLI audit "
+                "finding; verify the packaged IPK excludes development tooling.")
     epic = alias.split(".")[0]
     if epic == "E01":
         return None
@@ -207,7 +212,7 @@ EPICS = [
         ("Build automated validation and fixtures", "Establish CI for contracts, parsers, guide semantics, persistence migrations, remote state machines and failures. Seed realistic large/invalid fixtures and run gates on every change.", "E03.1 E03.2 E01.3"),
         ("Build visual and interaction regression coverage", "Create matching-state captures and scripted remote flows for every audited screen/menu, including loading, empty, error and disabled states. Expand coverage as features land; trace cases to inventory IDs.", "E01.2 E01.3 E04.5 E12.1"),
         ("Run real-TV compatibility and soak tests", "Verify webOS 22 and representative newer models: large catalogs, sustained playback, rapid tuning, network loss, resume, storage pressure and supported multiview. Every inventory item must be verified or an explicitly accepted gap.", "E11.2 E12.2 E03.5"),
-        ("Ship Developer Mode beta artifacts", "Produce versioned reproducible IPKs and source/notices, install/upgrade documentation, sanitized diagnostics and known limitations. Release only with parity/compatibility evidence; do not silently claim untested model support.", "E12.3 E01.5"),
+        ("Ship Developer Mode beta artifacts", "Produce versioned reproducible IPKs and source/notices, install/upgrade documentation, sanitized diagnostics and known limitations. Release only with parity/compatibility evidence; do not silently claim untested model support.", "E12.3 E01.5 E12.6"),
         ("Prepare and submit LG Store release", "Complete current LG requirements, privacy/support materials, assets, reviewer setup and release notes. Obtain final acceptance; submit through approved account and track review feedback to resolution.", "E12.4"),
     ]),
 ]
@@ -238,7 +243,14 @@ def main(references_only=False):
         for number, (child_title, acceptance, blockers) in enumerate(children, 1):
             entries.append((f"{alias}.{number}", child_title, priority, label, references,
                             alias, acceptance, blockers))
-    assert len(entries) == 72
+    entries.append((
+        "E12.6", "Assess webOS CLI dependency advisories before release packaging",
+        2, "tooling", "docs/webos-feasibility.md; spikes/webos-feasibility/package-lock.json",
+        "E12", "Record npm audit results and affected dependency paths; verify the "
+        "actual IPK excludes the host CLI; update or mitigate exploitable tool "
+        "vulnerabilities before sideload/public packaging with evidence.", "",
+    ))
+    assert len(entries) == 73
     aliases = {entry[0] for entry in entries}
     graph = {entry[0]: entry[7].split() for entry in entries}
 
@@ -262,7 +274,7 @@ def main(references_only=False):
         if references_only and alias not in ids:
             raise ValueError(f"Missing issue {alias}; bootstrap the board before linking references")
         if alias not in ids:
-            kind = "epic" if parent is None else "task" if alias.startswith(("E01.", "E02.", "E12.")) else "feature"
+            kind = "epic" if parent is None else "chore" if alias == "E12.6" else "task" if alias.startswith(("E01.", "E02.", "E12.")) else "feature"
             description = (f"Approved plan alias: {alias}\n\n{CONTRACT}\n"
                            f"Scope and outcome:\n{acceptance}\n\n"
                            f"Reference paths: {references}\nApple: {APPLE}\nAndroid: {ANDROID}\n\n{DOD}")
@@ -275,6 +287,8 @@ def main(references_only=False):
                 args += ["--spec-id", reference[0], "--notes", reference[1]]
             if parent:
                 args += ["--parent", ids[parent]]
+            if alias == "E12.6":
+                args += ["--deps", "discovered-from:" + ids["E02.1"]]
             issue = bd(*args)
             ids[alias] = issue["id"]
         elif reference_for(alias):

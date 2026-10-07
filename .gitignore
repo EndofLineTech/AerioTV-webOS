@@ -12,3 +12,7 @@ __pycache__/
 node_modules/
 dist/
 *.ipk
+
+# Generated media, staged webOS packages, and developer-only dependencies.
+spikes/webos-feasibility/build/
+spikes/webos-feasibility/out/
