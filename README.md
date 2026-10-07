@@ -14,7 +14,8 @@ The pinned-source specification covers the [TV screen/settings inventory](docs/r
 [reuse/attribution requirements](docs/reuse-attribution.md).
 
 E02 platform research, including LG's documented single-media-element limit,
-is in [the capability evidence ledger](docs/webos-feasibility.md). The separate
+is in [the capability evidence ledger](docs/webos-feasibility.md). Multiview
+testing and implementation are **deferred** by product decision; the separate
 [macOS Simulator/retail-TV diagnostic probe](spikes/webos-feasibility/README.md)
 uses synthetic fixtures; retail hardware results remain pending.
 

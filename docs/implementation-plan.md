@@ -11,6 +11,8 @@ Issue status and implementation work are tracked exclusively in Beads.
 - TV-only application, no additional external server. Existing Dispatcharr
   server-side features remain in scope.
 - Developer Mode sideload first, then LG Store distribution.
+- Multiview is deferred with no target date. E02.3 and E10 remain open for a
+  later phase, but do not block the current app, beta or Store release.
 - Pin Apple to `adad9b0ca082833abed1b56509474aaecf1cb0f7` and Android to
   `de9389f2661d3e2b142c10f5b9595213468c1bfb`.
 
@@ -29,6 +31,8 @@ background execution, playback speed, cloud SDK access or companion interoperabi
 Native webOS playback documentation lists non-1x speeds as unsupported. Preserve
 LG long-Back Home behavior and use platform Back at app root. Feasibility findings
 must lead to explicit decisions; a disabled menu or static thumbnail is not parity.
+Hide multiview staging, tile and settings actions in the current-phase UI; the
+reference inventory retains their behavior for the later E10 phase.
 
 ## Delivery milestones
 
@@ -38,7 +42,7 @@ must lead to explicit decisions; a disabled menu or static thumbnail is not pari
 | M1 | First playable IPK with onboarding, three source types, lists and playback |
 | M2 | Daily-use Live TV: guide, search, favorites, menus, mini-player, remote mapping |
 | M3 | VOD, viewing state, Dispatcharr DVR and reminders |
-| M4 | Proven advanced capabilities, settings, sync and companion integrations |
+| M4 | Proven non-multiview advanced capabilities, settings, sync and companion integrations |
 | M5 | Real-TV regression evidence, sideload beta and LG Store submission |
 
 The early playable milestone does not replace the full approved scope. Estimate
@@ -49,8 +53,10 @@ delivery dates after M0 establishes actual device limits and menu inventory.
 Every feature links to pinned source behavior and acceptance criteria; relevant
 automated tests, remote/focus checks, matching-state visual checks and error/retry
 coverage are required. Playback/input/storage/lifecycle require physical-TV evidence.
-All inventory items must be implemented and verified or explicitly accepted as
-platform gaps. Failed feasibility does not automatically complete a feature.
+All **in-scope** inventory items must be implemented and verified or explicitly
+accepted as platform gaps. Deferred multiview remains future scope, not a
+failed or completed feature. Failed feasibility does not automatically complete
+a feature.
 
 The exact LG TV model available for testing remains an input to E02.1. Hardware
 access blocks executing device spikes, but does not block creating the backlog.
@@ -87,7 +93,7 @@ The [E02 evidence ledger](webos-feasibility.md) distinguishes LG documentation,
 packaged developer-probe tests, Simulator observations and retail TV results.
 LG's [multi-video FAQ](https://webostv.developer.lge.com/faq/can-i-use-two-video-tags-at-the-same-time)
 states that two simultaneous HTML video elements are not officially supported;
-the nine-stream goal requires an explicit hardware/architecture decision.
+the nine-stream goal remains in deferred E02.3/E10 for later re-evaluation.
 
 ## References
 

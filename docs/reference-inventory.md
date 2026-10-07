@@ -6,6 +6,9 @@ Reference snapshot: Apple [`adad9b0`](https://github.com/jonzey231/AerioTV/tree/
 
 Use tvOS runtime routes and labels first. Android TV adds complementary functionality only after explicit gating in [platform decisions](platform-decisions.md). A README description, an old design plan and a commented-out row cannot override code that builds the current TV view. In particular: `Design/Typography.swift:500-518` disables the tvOS Live TV List; `Features/Home/HomeView.swift:4410-4454,6793-6804` defines **Live TV, DVR, Movies, TV Shows, Settings**, with Favorites implemented as a group, not a tab. On TV, show DVR only when applicable and Movies/TV Shows only when that library is available; maintain selected-tab stability across provider refresh (`HomeView.swift:6855-6888`). Android TV at this snapshot retains an **On Demand** tab rather than split Movies/TV Shows (`feature/main/MainScaffold.kt:2986-3006`).
 
+S09 and multiview-related controls below remain **upstream references for the
+deferred E10 phase**, not requirements to render them in the current app.
+
 ## Screen/overlay inventory
 
 | ID | tvOS route, states and controls | Source anchors | Gating / behavior |

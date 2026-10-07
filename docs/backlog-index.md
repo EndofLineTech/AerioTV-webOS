@@ -35,6 +35,11 @@ stage is webOS feasibility under `aerio-c1x`; check `bd ready --json` for work.
 Epics may appear in `bd ready` as organizational containers; select actionable
 child work rather than treating an epic as implementation-ready.
 
+The product owner deferred `aerio-c1x.3` (multiview feasibility) and
+`aerio-tbw` with all five children, **without a target date**. Their `bd`
+status is `deferred`, not closed. Active E02, guide, settings and release issues
+no longer wait on multiview; reactivation requires a deliberate decision.
+
 Every E02–E12 epic and child bead carries direct links to the relevant E01
 specification in its notes and a primary `spec_id`. The notes also identify
 the applicable inventory screens and the tvOS-first source corrections. Run
@@ -42,10 +47,10 @@ the applicable inventory screens and the tvOS-first source corrections. Run
 on an existing board; it preserves status, other notes, and chosen spec IDs.
 
 The original 72 issues were created open; E12.6 is the first discovered item.
-The baseline had 60 parent-child relationships and 164 task-level blocking
-dependencies; E12.6 adds a child and a blocker for E12.4. The Dolt database
-is local and excluded from Git by Beads. After cloning, run
+The current graph has 61 parent-child relationships and 162 task-level blocking
+dependencies after adding E12.6 and removing three multiview prerequisites.
+The Dolt database is local and excluded from Git by Beads. After cloning, run
 `bd init --prefix aerio` and `python3 scripts/create_backlog.py` to reconstruct
-these initial issues under the same IDs. This is an initial-board bootstrap,
-not a way to sync later statuses;
-configure a shared Dolt remote before using multiple working clones.
+these issues under the same IDs with the multiview items deferred. This is an
+initial-board bootstrap, not a way to sync later statuses. Configure a shared
+Dolt remote before using multiple working clones.

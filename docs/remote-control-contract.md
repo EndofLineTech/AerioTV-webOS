@@ -2,6 +2,9 @@
 
 Sources: Apple pinned `Shared/RemoteControlMap.swift:24-249`, `Shared/RemoteControlStore.swift:4-49,56-141`, `Shared/TVPressGesture.swift:5-55`, `Features/Settings/RemoteControlSettingsView.swift:39-205`, `Features/Home/HomeView.swift:8332-8510`, `Features/Settings/TVSettingsSplitView.swift:9-25`, `App/PlayerView.swift:2170-2250,4296-4375`; Android pinned `core/remote/RemoteControlMap.kt:34-98,198-239`, `docs/guide-semantics.md:103-150`; [LG Magic Remote](https://webostv.developer.lge.com/develop/guides/magic-remote), [LG Back](https://webostv.developer.lge.com/develop/guides/back-button). tvOS behavior wins where defaults differ.
 
+The multiview row of the upstream state table remains reference-only while
+E10 is deferred; it is not a current remote action or visible app route.
+
 ## Available physical input
 
 | LG input | Key code / web event | Rule |

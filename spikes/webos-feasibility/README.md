@@ -120,9 +120,12 @@ with query strings or response bodies. Inspect before sharing anyway.
 | One MP4, one HLS, one MSE | `loadedmetadata`, `playing`, errors, image/audio, MSE append, buffered ranges. Repeat with the actual target provider only **after** determining safe auth and permission, without sharing credentials/logs. DASH and continuous-TS are **not** covered by these fixtures. |
 | Protected HLS; service request | Browser native video normally cannot attach an auth header to every manifest/segment; compare the failure to the service request with its synthetic header. This is a transport experiment, not a finished proxy. |
 | Seek/Rate/Metrics | Seek result and seekable range, actual playback-rate behavior (LG docs list non-1× as unsupported), video resolution, audio/subtitle/decoded-frame API availability. |
-| 2, 4, 9 tiles | Record **visible decoded motion**, not just successful `play()` promises or duplicated audio. Stop between trials. LG officially does **not** support two simultaneous `<video>` elements; do not conclude nine-stream support from emulator or browser API detection. |
 | App storage and service marker | Run Storage/Service Storage, leave/relaunch/reboot and repeat; note survival, quota, errors and service/web-app data separation. Do not infer local DVR or indefinite background recording from small-marker success. |
 | Home/Back/suspend | Press Back at probe root (LG exit behavior), open another TV app, relaunch, repeat playback and storage. Note foreground/hidden events, video cleanup and any screensaver interference. |
+
+**Multiview is deferred.** The 2/4/9 buttons remain in this developer probe
+for future investigation only. Skip them in the current Simulator and TV runs;
+their presence is not a current product feature or acceptance requirement.
 
 See [E02 capability evidence](../../docs/webos-feasibility.md) for source-cited
 constraints and the exact decision gates. No TV tests have been recorded in the

@@ -2,6 +2,12 @@
 
 Product owner decisions on 2026-10-06: tvOS-first reference, webOS 22+, sideload then LG Store, TV-only (no additional external server), repository-only visual references, and authorized AerioTV branding/source reuse. The entries here apply those decisions to concrete **pinned-source** differences; they are not hardware-capability findings. E02 owns outstanding viability tests.
 
+**Later scope update:** The owner deferred multiview without a target date.
+The E01 inventory still specifies upstream tiles/menus for a later E10 phase;
+the current TV app hides multiview entry points and settings. E02.3 does not
+gate the current feasibility epic or release. See
+[E02 evidence](webos-feasibility.md) for LG's documented media limit.
+
 | Topic | Apple pinned TV behavior | Android pinned TV behavior | webOS decision / owner |
 | --- | --- | --- | --- |
 | Top tabs | Guide-only Live TV; DVR, Movies and TV Shows conditionally visible; Favorites as group; Search circle outside tabs (`HomeView.swift:4410-4454,6793-6804`). | Live TV, optional Favorites and DVR, On Demand, Settings; phone/tablet split Movies/TV Shows; Search circle on TV (`feature/main/MainScaffold.kt:2986-3006`). | **Approved tvOS baseline:** separate Movies/TV Shows, Favorites group, dynamic DVR; separate Search action. E04/E06/E08. |

@@ -31,6 +31,10 @@ EPIC_IDS = {
     "E10": "aerio-tbw", "E11": "aerio-8m4", "E12": "aerio-6cv",
 }
 
+# Product owner deferred multiview without a target date. Only newly created
+# issues are deferred during bootstrap; a rerun never changes existing status.
+DEFERRED_ALIASES = {"E02.3", "E10", *(f"E10.{n}" for n in range(1, 6))}
+
 # The E01 specification is the implementation contract for every downstream
 # issue. Keep the link text in the bootstrap manifest so newly initialized
 # boards carry the same references as the original Dolt database.
@@ -133,7 +137,7 @@ EPICS = [
         ("Prove playback coverage", "Test native/MSE HLS, DASH, progressive, continuous TS, codec/audio combinations, tracks, subtitles, seek, HDR, speed and diagnostics on retail hardware. Record fixtures and select supported engines; native non-1x speed is documented unsupported.", "E01.1"),
         ("Prove simultaneous playback", "Measure 1/2/4/9 streams where feasible, resolution combinations, video-plane composition, audio ownership, decoder limits and resource-exhaustion recovery. Publish model-specific evidence; do not promise nine streams.", "E02.2"),
         ("Prove storage and lifecycle capabilities", "Test persistent data, recording/download destinations, quota, local timeshift, service APIs, foreground/background, termination and interrupted writes. Establish Store-permitted capabilities and cleanup on physical TVs.", "E01.1"),
-        ("Approve capability decisions", "Evaluate cloud authentication/sync, companion discovery/control, system PiP, home integration and Store API availability. Consolidate spike evidence into ADRs, capability matrix and explicit product decisions. Record hardware needs and remaining blockers.", "E01.4 E02.1 E02.2 E02.3 E02.4"),
+        ("Approve capability decisions", "Evaluate cloud authentication/sync, companion discovery/control, system PiP, home integration and Store API availability. Consolidate spike evidence into ADRs, capability matrix and explicit product decisions. Multiview feasibility E02.3 is deferred and not a current gate.", "E01.4 E02.1 E02.2 E02.4"),
     ]),
     ("E03", "Build the application foundation", 1, "foundation",
      "Apple Models/, Networking/, Shared/; Android core/data/, core/network/, core/security/", [
@@ -164,7 +168,7 @@ EPICS = [
         ("Implement channel lists groups and collections", "Match sorting/filtering, group sidebar/pills, visibility, numbers, favorites ordering and retained selection. Define source-scoped collection behavior from the audit.", "E05.2 E05.3 E05.4 E04.3 E04.5"),
         ("Implement EPG identity and merging", "Test one-to-many TVG matches, Dispatcharr EPG bindings, source precedence, timezone/DST, history retention and invalid-empty-refresh rejection. Follow pinned guide semantics and retain valid cache after failure.", "E05.2 E05.3 E05.4"),
         ("Implement virtualized guide", "Match anchor-time vertical movement, 30-minute horizontal steps, lane scrolling, empty rows/gaps, jump-to-now/date, zoom, preview banner and now-line. Validate large data and focus retention.", "E06.1 E06.2 E04.4"),
-        ("Implement program details and actions", "Current/future/past programs expose capability-correct play, favorite, reminder, recording, catchup and multiview actions; implement integrations and return focus to origin. Conditional features need explicit decisions.", "E06.3 E07.5 E09.1 E09.5 E10.1"),
+        ("Implement program details and actions", "Current/future/past programs expose capability-correct play, favorite, reminder, recording and catch-up actions; implement integrations and return focus to origin. Hide multiview staging/actions until the deferred E10 phase is reactivated.", "E06.3 E07.5 E09.1 E09.5"),
         ("Implement global search and recent channels", "Implement source-scoped results, debounce/cancellation, navigation/tuning and recent history. Older responses cannot replace newer results; returning restores query and focus.", "E06.1 E06.2 E07.2 E08.1"),
     ]),
     ("E07", "Implement playback and player interface", 1, "playback",
@@ -202,7 +206,7 @@ EPICS = [
     ("E11", "Complete settings sync and TV integrations", 2, "settings",
      "Apple Features/Settings/SettingsDestination.swift, Features/Settings/, Shared/SyncManager.swift; Android feature/settings/, core/sync/, core/cast/companion/", [
         ("Implement two-pane settings navigation", "Match rail ordering, selection-on-focus, debounced pane swaps flushed on entry, full-screen editors, scroll retention and Back-to-rail behavior. Deep returns restore selected rail focus.", "E01.4 E04.2 E04.4 E05.5"),
-        ("Implement every audited preference", "Cover Playlists, Live TV, Player, Movies & TV, DVR, Appearance, General, Remote Control, Sync/Categories, Developer and About. Every inventory row has exact copy/default, persistence and verified side effects or an accepted gap.", "E11.1 E06.4 E06.5 E07.4 E08.5 E09.3 E09.4 E10.5 E11.3 E11.4 E11.5"),
+        ("Implement every audited preference", "Cover Playlists, Live TV, Player, Movies & TV, DVR, Appearance, General, Remote Control, Sync/Categories, Developer and About. Every in-scope control has correct copy/default, persistence and verified side effects or an accepted gap. Hide multiview controls until deferred E10 is reactivated.", "E11.1 E06.4 E06.5 E07.4 E08.5 E09.3 E09.4 E11.3 E11.4 E11.5"),
         ("Implement supported sync import and export", "Use E02.5-approved auth/backend and compatible schemas where possible. Test selective categories, merge conflicts, scoped cloud deletion and credential handling. No account is required for local usage; no unapproved external server.", "E02.5 E03.3 E03.4 E08.4 E09.5 E05.5"),
         ("Implement interoperable companion handoff and control", "Prove discovery/pairing, existing sender compatibility, tune/control/stop and disconnect. Track required upstream mobile changes explicitly; built-in Cast/AirPlay is not evidence of app-level receiver support.", "E02.5 E07.4"),
         ("Implement supported system integration", "Validate launch parameters, deep links, home/resume integration, accessibility semantics and feasible system PiP separately from mini-player. Preserve LG system keys and documented lifecycle behavior.", "E02.5 E04.5 E07.4 E03.5"),
@@ -210,10 +214,10 @@ EPICS = [
     ("E12", "Verify parity and deliver releases", 1, "release",
      "Both pinned repositories and all accepted parity contracts; LG distribute/app-self-checklist and distribute/app-approval-process", [
         ("Build automated validation and fixtures", "Establish CI for contracts, parsers, guide semantics, persistence migrations, remote state machines and failures. Seed realistic large/invalid fixtures and run gates on every change.", "E03.1 E03.2 E01.3"),
-        ("Build visual and interaction regression coverage", "Create matching-state captures and scripted remote flows for every audited screen/menu, including loading, empty, error and disabled states. Expand coverage as features land; trace cases to inventory IDs.", "E01.2 E01.3 E04.5 E12.1"),
-        ("Run real-TV compatibility and soak tests", "Verify webOS 22 and representative newer models: large catalogs, sustained playback, rapid tuning, network loss, resume, storage pressure and supported multiview. Every inventory item must be verified or an explicitly accepted gap.", "E11.2 E12.2 E03.5"),
-        ("Ship Developer Mode beta artifacts", "Produce versioned reproducible IPKs and source/notices, install/upgrade documentation, sanitized diagnostics and known limitations. Release only with parity/compatibility evidence; do not silently claim untested model support.", "E12.3 E01.5 E12.6"),
-        ("Prepare and submit LG Store release", "Complete current LG requirements, privacy/support materials, assets, reviewer setup and release notes. Obtain final acceptance; submit through approved account and track review feedback to resolution.", "E12.4"),
+        ("Build visual and interaction regression coverage", "Create matching-state captures and scripted remote flows for every in-scope audited screen/menu, including loading, empty, error and disabled states. Trace cases to inventory IDs; multiview screens are deferred with E10.", "E01.2 E01.3 E04.5 E12.1"),
+        ("Run real-TV compatibility and soak tests", "Verify webOS 22 and representative newer models: large catalogs, single-stream playback, rapid tuning, network loss, resume and storage pressure. Every in-scope inventory item must be verified or an explicitly accepted platform gap; multiview is deferred.", "E11.2 E12.2 E03.5"),
+        ("Ship Developer Mode beta artifacts", "Produce versioned reproducible IPKs and source/notices, install/upgrade documentation, sanitized diagnostics and known limitations. Disclose deferred multiview and do not claim untested model support.", "E12.3 E01.5 E12.6"),
+        ("Prepare and submit LG Store release", "Complete current LG requirements, privacy/support materials, assets, reviewer setup and release notes. Obtain final acceptance on current scope excluding deferred multiview; submit through approved account and track review feedback to resolution.", "E12.4"),
     ]),
 ]
 
@@ -239,7 +243,10 @@ def main(references_only=False):
     entries = []
     for alias, title, priority, label, references, children in EPICS:
         entries.append((alias, title, priority, label, references, None,
-                        "Deliver the five approved child outcomes with traceable parity evidence.", ""))
+                        ("Deliver E02.1, E02.2, E02.4 and E02.5 with physical-TV evidence; "
+                         "multiview E02.3 is deferred and does not block this epic."
+                         if alias == "E02" else
+                         "Deliver the approved in-scope child outcomes with traceable parity evidence."), ""))
         for number, (child_title, acceptance, blockers) in enumerate(children, 1):
             entries.append((f"{alias}.{number}", child_title, priority, label, references,
                             alias, acceptance, blockers))
@@ -270,6 +277,7 @@ def main(references_only=False):
     for alias in aliases:
         visit(alias, set(), done)
 
+    created_aliases = set()
     for alias, title, priority, label, references, parent, acceptance, blockers in entries:
         if references_only and alias not in ids:
             raise ValueError(f"Missing issue {alias}; bootstrap the board before linking references")
@@ -291,6 +299,7 @@ def main(references_only=False):
                 args += ["--deps", "discovered-from:" + ids["E02.1"]]
             issue = bd(*args)
             ids[alias] = issue["id"]
+            created_aliases.add(alias)
         elif reference_for(alias):
             spec, note = reference_for(alias)
             current = existing_by_alias[alias]
@@ -307,6 +316,8 @@ def main(references_only=False):
         for alias, _, _, _, _, _, _, blockers in entries:
             for dependency in blockers.split():
                 bd("dep", "add", ids[alias], ids[dependency])
+        for alias in sorted(created_aliases & DEFERRED_ALIASES):
+            bd("defer", ids[alias])
     print(f"Verified manifest: {len(EPICS)} epics, {len(entries) - len(EPICS)} children, "
           f"{sum(len(v) for v in graph.values())} blocking edges; acyclic.")
 
