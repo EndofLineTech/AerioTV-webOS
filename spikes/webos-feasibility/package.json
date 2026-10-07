@@ -11,5 +11,8 @@
   },
   "devDependencies": {
     "@webos-tools/cli": "3.2.6"
+  },
+  "dependencies": {
+    "hls.js": "1.7.3"
   }
 }

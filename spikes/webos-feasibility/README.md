@@ -114,7 +114,10 @@ npm exec -- ares-launch --device aerio-tv com.endoflinetech.aeriotvfeasibility
 
 The build downloads **LG webOSTV.js v1.2.13** directly from LG, checks SHA-256
 `507c759f65a035122afead166608e8c7f444961468c3570245f0982c8f855ff6`,
-and packages its Apache-2.0 license. The IPK and generated media are ignored by
+and packages its Apache-2.0 license. It also bundles the pinned Apache-2.0
+[HLS.js 1.7.3](https://github.com/video-dev/hls.js#compatibility) UMD build and
+license for the **MSE HLS diagnostic only**, without a CDN or hosted player.
+The IPK and generated media are ignored by
 Git. The `@webos-tools/cli` package is a host-only devDependency: not shipped
 inside the TV app.
 
@@ -136,6 +139,7 @@ bodies. Inspect before sharing it further anyway.
 | --- | --- |
 | Device; CORS test; service request | Model/version, browser CORS/no-CORS, preflight token success/401, redirect, Range/206, image CORS, service status and custom User-Agent feasibility. System info uses `systemconfig.query` ACG when enforced. |
 | One MP4, one HLS, one MSE | `loadedmetadata`, `playing`, errors, image/audio, MSE append, buffered ranges. Repeat with the actual target provider only **after** determining safe auth and permission, without sharing credentials/logs. DASH and continuous-TS are **not** covered by these fixtures. |
+| HLS.js/MSE, then protected HLS via service + MSE | **Play HLS-TS via MSE (HLS.js)** tests whether JS transmuxes synthetic HLS-TS to fMP4 where native HLS failed in Simulator 26. If that shows picture and tone, **Try protected HLS via service + MSE** checks the same path with the on-TV service adding the fixture auth header to its synthetic LAN requests. Compare error type/fatal status and observe picture/audio; stop afterward. This is an experiment, not the selected app player. |
 | Protected HLS; service request; on-TV media proxy | Browser native video normally cannot attach an auth header to every manifest/segment, and the second protected fixture has no CORS. Compare direct failure, the service's synthetic header request, and **Try protected HLS via on-TV JS service**. Observe actual picture/audio for at least 10 seconds; then **Stop on-TV media probe**. The service binds a short-lived loopback-only URL, not an external product server. Simulator success is not retail-TV proof. |
 | Seek/Rate/Metrics | Seek result and seekable range, actual playback-rate behavior (LG docs list non-1× as unsupported), video resolution, audio/subtitle/decoded-frame API availability. |
 | App storage and service marker | Run Storage/Service Storage, leave/relaunch/reboot and repeat; note survival, quota, errors and service/web-app data separation. Do not infer local DVR or indefinite background recording from small-marker success. |

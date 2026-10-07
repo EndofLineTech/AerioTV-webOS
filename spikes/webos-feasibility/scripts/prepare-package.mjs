@@ -74,6 +74,10 @@ function download(url) {
 await mkdir(join(app, 'lib'), { recursive: true });
 await cp(join(root, 'app'), app, { recursive: true, force: true });
 await writeFile(join(app, 'icon.png'), icon());
+await cp(join(root, 'node_modules', 'hls.js', 'dist', 'hls.min.js'),
+  join(app, 'lib', 'hls.min.js'));
+await cp(join(root, 'node_modules', 'hls.js', 'LICENSE'),
+  join(app, 'lib', 'hls-js-LICENSE.txt'));
 
 const library = await download(libraryUrl);
 if (createHash('sha256').update(library).digest('hex') !== librarySHA256) {
@@ -89,4 +93,4 @@ for (const [match, target] of [
   if (!member) throw new Error(`LG archive is missing ${match}`);
   await writeFile(join(app, 'lib', target), execFileSync('unzip', ['-p', archive, member]));
 }
-console.log(`Staged LG webOSTV.js 1.2.13 (SHA-256 verified), app and icon in ${app}`);
+console.log(`Staged LG webOSTV.js 1.2.13 (SHA-256 verified), HLS.js 1.7.3, app and icon in ${app}`);

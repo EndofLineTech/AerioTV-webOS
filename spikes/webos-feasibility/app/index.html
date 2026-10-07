@@ -6,14 +6,15 @@
   <title>AerioTV Feasibility Probe</title>
   <link rel="stylesheet" href="probe.css">
   <script src="lib/webOSTV.js"></script>
-  <script src="probe.js?v=2" defer></script>
+  <script src="lib/hls.min.js"></script>
+  <script src="probe.js?v=3" defer></script>
 </head>
 <body>
   <main>
     <h1>AerioTV · webOS feasibility</h1>
     <p>Developer diagnostic only. Connect to the included synthetic fixture server; never enter IPTV credentials or real stream URLs.</p>
     <section id="playback-checks">
-      <h2>Single-stream checks · probe UI revision 2</h2>
+      <h2>Single-stream checks · probe UI revision 3</h2>
       <div class="probe-controls">
         <button id="seek">Seek first video to 3 seconds</button>
         <button id="rate">Set first video to 1.25×</button>
@@ -24,8 +25,10 @@
         <button id="mp4">Play one H.264/AAC MP4</button>
         <button id="mse">Play fragmented MP4 via MediaSource</button>
         <button id="hls">Play one HLS-TS stream</button>
+        <button id="hls-js">Play HLS-TS via MSE (HLS.js)</button>
         <button id="protected">Try header-protected HLS (expected to fail)</button>
         <button id="proxy">Try protected HLS via on-TV JS service</button>
+        <button id="proxy-hls-js">Try protected HLS via service + MSE</button>
         <button id="proxy-stop">Stop on-TV media probe</button>
         <button id="stop">Stop and release all video</button>
       </div>

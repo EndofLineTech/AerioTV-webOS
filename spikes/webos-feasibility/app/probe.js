@@ -7,6 +7,7 @@
   const tiles = document.getElementById('tiles');
   const input = document.getElementById('base');
   let mediaSubscription = null;
+  let hlsInstance = null;
 
   function log(label, result) {
     const value = result === undefined ? '' : ' ' + JSON.stringify(result);
@@ -100,6 +101,7 @@
       mp4: video.canPlayType(mime),
       mse: Boolean(mse),
       mseH264AAC: Boolean(mse?.isTypeSupported(mime)),
+      hlsJsMse: Boolean(window.Hls?.isSupported()),
       qualityApi: typeof video.getVideoPlaybackQuality === 'function',
     });
     if (typeof webOS === 'undefined' || !webOS.service?.request) {
@@ -152,6 +154,10 @@
   }
 
   function stopVideo() {
+    if (hlsInstance) {
+      hlsInstance.destroy();
+      hlsInstance = null;
+    }
     if (mediaSubscription) {
       if (typeof webOS !== 'undefined' && webOS.service?.request) {
         webOS.service.request('luna://com.endoflinetech.aeriotvfeasibility.network', {
@@ -241,6 +247,41 @@
     }, { once: true });
   }
 
+  function playHlsWithMse(sourceUrl, viaService) {
+    if (!window.Hls?.isSupported()) {
+      log('HLS.js MSE unsupported in this browser');
+      if (viaService) stopVideo();
+      return;
+    }
+    if (!viaService) stopVideo();
+    const video = document.createElement('video');
+    video.controls = true;
+    tiles.appendChild(video);
+    for (const eventName of ['loadedmetadata', 'playing', 'waiting', 'stalled', 'error', 'ended']) {
+      video.addEventListener(eventName, function () {
+        if (tiles.contains(video)) videoState(video, 0, eventName);
+      });
+    }
+    const hls = new window.Hls({ enableWorker: true });
+    hlsInstance = hls;
+    hls.on(window.Hls.Events.ERROR, function (_, error) {
+      if (hlsInstance !== hls) return;
+      log('HLS.js event error', { type: error.type, details: error.details, fatal: error.fatal });
+    });
+    hls.on(window.Hls.Events.MEDIA_ATTACHED, function () {
+      if (hlsInstance === hls) hls.loadSource(sourceUrl);
+    });
+    hls.on(window.Hls.Events.MANIFEST_PARSED, function () {
+      if (hlsInstance !== hls) return;
+      log('HLS.js manifest parsed', { viaService: viaService });
+      video.play().catch(function (error) {
+        log('HLS.js playback failed', { name: error.name, message: error.message });
+      });
+    });
+    hls.attachMedia(video);
+    log('HLS.js MSE test started', { viaService: viaService });
+  }
+
   function playMany(count, path) {
     const src = baseUrl() + path;
     stopVideo();
@@ -262,7 +303,7 @@
     log('attempted ' + count + ' concurrent media elements', { type: path, audioOwner: 0 });
   }
 
-  function playViaOnTVService() {
+  function playViaOnTVService(useMse) {
     if (typeof webOS === 'undefined' || !webOS.service?.request) {
       log('on-TV media probe unavailable: webOSTV.js service API missing');
       return;
@@ -299,6 +340,10 @@
           return;
         }
         log('on-TV media probe started', { port: response.port, leaseMs: response.leaseMs });
+        if (useMse) {
+          playHlsWithMse(response.url, true);
+          return;
+        }
         const player = document.createElement('video');
         player.controls = true;
         tiles.appendChild(player);
@@ -330,9 +375,11 @@
     },
     mp4: function () { playMany(1, '/vod.mp4'); },
     hls: function () { playMany(1, '/index.m3u8'); },
+    'hls-js': function () { playHlsWithMse(baseUrl() + '/index.m3u8', false); },
     mse: function () { playMSE().catch(function (error) { log('MSE setup failed', { message: error.message }); }); },
     protected: function () { playMany(1, '/protected/index.m3u8'); },
-    proxy: playViaOnTVService,
+    proxy: function () { playViaOnTVService(false); },
+    'proxy-hls-js': function () { playViaOnTVService(true); },
     'proxy-stop': stopVideo,
     stop: stopVideo,
     seek: function () { const video = firstVideo(); video.currentTime = 3; videoState(video, 0, 'seek requested'); },
