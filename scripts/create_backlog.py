@@ -4,6 +4,7 @@ Issue status stays exclusively in Beads. Run from the repository root.
 """
 import json
 import subprocess
+import sys
 
 APPLE = "https://github.com/jonzey231/AerioTV/tree/adad9b0ca082833abed1b56509474aaecf1cb0f7"
 ANDROID = "https://github.com/jonzey231/AerioTV-Android/tree/de9389f2661d3e2b142c10f5b9595213468c1bfb"
@@ -29,6 +30,87 @@ EPIC_IDS = {
     "E07": "aerio-0o2", "E08": "aerio-4ql", "E09": "aerio-qgp",
     "E10": "aerio-tbw", "E11": "aerio-8m4", "E12": "aerio-6cv",
 }
+
+# The E01 specification is the implementation contract for every downstream
+# issue. Keep the link text in the bootstrap manifest so newly initialized
+# boards carry the same references as the original Dolt database.
+REFERENCE_MARKER = "E01_REFERENCE_SPEC_V1"
+REFERENCE_DOCS = {
+    "E02": ("docs/platform-decisions.md", "docs/reference-inventory.md", "docs/remote-control-contract.md"),
+    "E03": ("docs/reuse-attribution.md", "docs/reference-inventory.md", "docs/visual-baseline.md"),
+    "E04": ("docs/remote-control-contract.md", "docs/visual-baseline.md", "docs/reference-inventory.md", "docs/platform-decisions.md"),
+    "E05": ("docs/reference-inventory.md", "docs/visual-baseline.md", "docs/reuse-attribution.md"),
+    "E06": ("docs/reference-inventory.md", "docs/remote-control-contract.md", "docs/platform-decisions.md", "docs/visual-baseline.md"),
+    "E07": ("docs/reference-inventory.md", "docs/remote-control-contract.md", "docs/platform-decisions.md", "docs/visual-baseline.md"),
+    "E08": ("docs/reference-inventory.md", "docs/visual-baseline.md", "docs/platform-decisions.md", "docs/reuse-attribution.md"),
+    "E09": ("docs/reference-inventory.md", "docs/platform-decisions.md", "docs/visual-baseline.md"),
+    "E10": ("docs/reference-inventory.md", "docs/remote-control-contract.md", "docs/platform-decisions.md", "docs/visual-baseline.md"),
+    "E11": ("docs/reference-inventory.md", "docs/remote-control-contract.md", "docs/platform-decisions.md", "docs/reuse-attribution.md"),
+    "E12": ("docs/reference-inventory.md", "docs/visual-baseline.md", "docs/remote-control-contract.md", "docs/platform-decisions.md", "docs/reuse-attribution.md"),
+}
+PRIMARY_SPEC = {
+    "E02": "docs/platform-decisions.md",
+    "E03": "docs/reuse-attribution.md",
+    "E04": "docs/remote-control-contract.md",
+    "E05": "docs/reference-inventory.md",
+    "E06": "docs/reference-inventory.md",
+    "E07": "docs/reference-inventory.md",
+    "E08": "docs/reference-inventory.md",
+    "E09": "docs/reference-inventory.md",
+    "E10": "docs/reference-inventory.md",
+    "E11": "docs/reference-inventory.md",
+    "E12": "docs/reference-inventory.md",
+    "E04.1": "docs/visual-baseline.md",
+    "E04.2": "docs/remote-control-contract.md",
+    "E04.3": "docs/remote-control-contract.md",
+    "E04.4": "docs/remote-control-contract.md",
+    "E05.1": "docs/visual-baseline.md",
+    "E06.3": "docs/remote-control-contract.md",
+    "E07.1": "docs/platform-decisions.md",
+    "E07.3": "docs/remote-control-contract.md",
+    "E07.4": "docs/remote-control-contract.md",
+    "E07.5": "docs/platform-decisions.md",
+    "E09.4": "docs/platform-decisions.md",
+    "E10.2": "docs/remote-control-contract.md",
+    "E10.5": "docs/platform-decisions.md",
+    "E11.1": "docs/remote-control-contract.md",
+    "E11.3": "docs/platform-decisions.md",
+    "E11.4": "docs/platform-decisions.md",
+    "E11.5": "docs/platform-decisions.md",
+    "E12.2": "docs/visual-baseline.md",
+    "E12.3": "docs/platform-decisions.md",
+    "E12.4": "docs/reuse-attribution.md",
+    "E12.5": "docs/reuse-attribution.md",
+}
+SCREEN_FOCUS = {
+    "E02": "S04/S07/S09/S11/S13: source requirements are not proof of LG capability.",
+    "E03": "S01-S13: retain source-scoped identities and record asset provenance.",
+    "E04": "S03/S12: TV guide-only; Favorites is a group; Movies and TV Shows are separate tabs. Long Back belongs to LG.",
+    "E05": "S01/S02/S12: seven repository screenshots cover only splash and onboarding; source gates control fields.",
+    "E06": "S04-S06: TV guide-only; Favorites is a group, not a tab; use the guide focus/time contract.",
+    "E07": "S07/S08: follow rendered Options order and player/mini Back ladder, subject to E02 playback evidence.",
+    "E08": "S10: separate Movies and TV Shows tabs on TV; do not copy Android TV's On Demand tab.",
+    "E09": "S05/S11: TV default-buffer steppers differ from per-record custom buffers; local DVR needs E02 proof.",
+    "E10": "S09: rendered tile menu starts Remove then Move Tile; nine decoders are not guaranteed.",
+    "E11": "S12/S13: use current 11-category settings rail, not historical App Behaviors/Network/Multiview panes.",
+    "E12": "S01-S13: only splash/onboarding have repository images; create webOS captures for remaining states.",
+}
+
+
+def reference_for(alias):
+    """Return primary spec and Beads note for an E02-E12 epic or child."""
+    epic = alias.split(".")[0]
+    if epic == "E01":
+        return None
+    docs = REFERENCE_DOCS[epic]
+    primary = PRIMARY_SPEC.get(alias, PRIMARY_SPEC[epic])
+    assert primary in docs, (alias, primary)
+    note = (f"{REFERENCE_MARKER}: Read {', '.join(docs)}. "
+            f"Reference inventory IDs: {SCREEN_FOCUS[epic]} "
+            "Follow pinned Apple/Android source links inside these documents; "
+            "repository-only visual baseline is not a current device capture. "
+            "E02 hardware findings and E12 visual/device verification gate parity claims.")
+    return primary, note
 
 # Alias, title, priority, label, reference paths, five (title, scope/acceptance, blockers).
 EPICS = [
@@ -136,9 +218,10 @@ def bd(*args):
     return json.loads(result.stdout)
 
 
-def main():
+def main(references_only=False):
     existing = bd("list", "--all", "--limit", "0")
     ids = {}
+    existing_by_alias = {}
     for issue in existing:
         for label in issue.get("labels", []):
             if label.startswith("plan-"):
@@ -146,6 +229,7 @@ def main():
                 if alias in ids:
                     raise ValueError(f"Duplicate alias {alias}")
                 ids[alias] = issue["id"]
+                existing_by_alias[alias] = issue
 
     entries = []
     for alias, title, priority, label, references, children in EPICS:
@@ -175,6 +259,8 @@ def main():
         visit(alias, set(), done)
 
     for alias, title, priority, label, references, parent, acceptance, blockers in entries:
+        if references_only and alias not in ids:
+            raise ValueError(f"Missing issue {alias}; bootstrap the board before linking references")
         if alias not in ids:
             kind = "epic" if parent is None else "task" if alias.startswith(("E01.", "E02.", "E12.")) else "feature"
             description = (f"Approved plan alias: {alias}\n\n{CONTRACT}\n"
@@ -184,18 +270,34 @@ def main():
                     "--description", description, "--acceptance", acceptance + "\n\n" + DOD,
                     "--labels", f"webos,parity,{label},plan-{alias}",
                     "--id", EPIC_IDS[alias.split(".")[0]] + ("." + alias.split(".")[1] if parent else "")]
+            reference = reference_for(alias)
+            if reference:
+                args += ["--spec-id", reference[0], "--notes", reference[1]]
             if parent:
                 args += ["--parent", ids[parent]]
             issue = bd(*args)
             ids[alias] = issue["id"]
+        elif reference_for(alias):
+            spec, note = reference_for(alias)
+            current = existing_by_alias[alias]
+            update = ["update", ids[alias]]
+            if REFERENCE_MARKER not in (current.get("notes") or ""):
+                update += ["--append-notes", note]
+            if not current.get("spec_id"):
+                update += ["--spec-id", spec]
+            if len(update) > 2:
+                bd(*update)
         print(f"{alias}\t{ids[alias]}\t{title}", flush=True)
 
-    for alias, _, _, _, _, _, _, blockers in entries:
-        for dependency in blockers.split():
-            bd("dep", "add", ids[alias], ids[dependency])
+    if not references_only:
+        for alias, _, _, _, _, _, _, blockers in entries:
+            for dependency in blockers.split():
+                bd("dep", "add", ids[alias], ids[dependency])
     print(f"Verified manifest: {len(EPICS)} epics, {len(entries) - len(EPICS)} children, "
           f"{sum(len(v) for v in graph.values())} blocking edges; acyclic.")
 
 
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] not in ([], ["--references-only"]):
+        raise SystemExit("Usage: python3 scripts/create_backlog.py [--references-only]")
+    main(references_only="--references-only" in sys.argv)

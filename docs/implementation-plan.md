@@ -67,7 +67,10 @@ Parent-child hierarchy is
 separate from actual blocking edges; dependencies are task-level so unrelated work
 can proceed in parallel. Capability-gated features remain tracked until explicitly
 resolved by the product owner. Use Beads for subsequent changes, not this manifest
-as a second status board.
+as a second status board. All downstream E02–E12 epic/child issues now reference
+the relevant E01 specifications directly in Beads notes and via their primary
+`spec_id`; `python3 scripts/create_backlog.py --references-only` reconciles
+missing references without altering issue status.
 
 Source inventories, visual baselines, remote contracts, capability matrices and ADRs
 are deliverables of E01/E02. The E01 source-reference package is

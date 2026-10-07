@@ -29,9 +29,16 @@ bd dep tree aerio-6cv.5
 bd dep cycles --json
 ```
 
-Start with `aerio-bk6.1` (pin and inventory upstream behavior). Epics may appear in
-`bd ready` as organizational containers; select actionable child work rather than
-treating an epic's appearance as evidence that its implementation is unblocked.
+E01 and its five children were completed in the original local board. The next
+stage is webOS feasibility under `aerio-c1x`; check `bd ready --json` for work.
+Epics may appear in `bd ready` as organizational containers; select actionable
+child work rather than treating an epic as implementation-ready.
+
+Every E02–E12 epic and child bead carries direct links to the relevant E01
+specification in its notes and a primary `spec_id`. The notes also identify
+the applicable inventory screens and the tvOS-first source corrections. Run
+`python3 scripts/create_backlog.py --references-only` to restore missing links
+on an existing board; it preserves status, other notes, and chosen spec IDs.
 
 All 72 issues were created open. There are 60 parent-child relationships and 164
 task-level blocking dependencies. The initial Dolt database is local and excluded
