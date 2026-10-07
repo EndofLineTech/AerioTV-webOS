@@ -141,9 +141,8 @@ bodies. Inspect before sharing it further anyway.
 | App storage and service marker | Run Storage/Service Storage, leave/relaunch/reboot and repeat; note survival, quota, errors and service/web-app data separation. Do not infer local DVR or indefinite background recording from small-marker success. |
 | Home/Back/suspend | Press Back at probe root (LG exit behavior), open another TV app, relaunch, repeat playback and storage. Note foreground/hidden events, video cleanup and any screensaver interference. |
 
-**Multiview is deferred.** The 2/4/9 buttons remain in this developer probe
-for future investigation only. Skip them in the current Simulator and TV runs;
-their presence is not a current product feature or acceptance requirement.
+**Multiview is deferred.** The current probe UI includes only single-stream
+playback checks; there are no 2/4/9-stream controls to run.
 
 See [E02 capability evidence](../../docs/webos-feasibility.md) for source-cited
 constraints and the exact decision gates. No TV tests have been recorded in the

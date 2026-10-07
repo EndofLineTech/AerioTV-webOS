@@ -334,9 +334,6 @@
     protected: function () { playMany(1, '/protected/index.m3u8'); },
     proxy: playViaOnTVService,
     'proxy-stop': stopVideo,
-    two: function () { playMany(2, '/index.m3u8'); },
-    four: function () { playMany(4, '/index.m3u8'); },
-    nine: function () { playMany(9, '/index.m3u8'); },
     stop: stopVideo,
     seek: function () { const video = firstVideo(); video.currentTime = 3; videoState(video, 0, 'seek requested'); },
     rate: function () {
